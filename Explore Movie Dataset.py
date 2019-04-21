@@ -70,6 +70,7 @@ movie_data=pd.read_csv('./tmdb-movies.csv')
 # In[2]:
 
 
+print(movie_data.shape)
 movie_data.head()
 movie_data.tail()
 movie_data.sample(5)
@@ -199,33 +200,40 @@ movie_data_director.sort_values('mean',ascending=False)
 
 # **任务3.1：**对 `popularity` 最高的20名电影绘制其 `popularity` 值。
 
-# In[7]:
+# In[10]:
 
 
 movie_data_top20pop=movie_data2.sort_values('popularity',ascending=False)[:20]
 movie_data_top20pop=movie_data_top20pop.sort_values('popularity')
 #plt.figure(figsize=(5,5))
-plt.errorbar(data=movie_data2,x=movie_data_top20pop['popularity'],y=movie_data_top20pop['original_title'])
+plt.xlabel('popularity score')
+plt.ylabel('movie title')
+plt.barh(data=movie_data_top20pop,width='popularity',y='original_title')
 
 
 # ---
 # **任务3.2：**分析电影净利润（票房-成本）随着年份变化的情况，并简单进行分析。
 
-# In[25]:
+# In[19]:
 
 
 movie_data_profit=movie_data2
 movie_data_profit['profit']=movie_data_profit['revenue']-movie_data_profit['budget']
-num_agg=['sum']
-movie_data_profit_gb_year=movie_data_profit.groupby('release_year')['profit'].agg(num_agg)
-#print(movie_data_profit_gb_year)
-plt.plot(movie_data_profit_gb_year)
-print('\n')
-print(movie_data_profit_gb_year.index)
-print(movie_data_profit_gb_year.columns)
-print(type(movie_data_profit_gb_year.columns))
-#问题：如果参数中要加入x=和y=，应该怎么写？
-#plt.plot(movie_data_profit_gb_year,x=movie_data_profit_gb_year.index,y=movie_data_profit_gb_year[('prifit','sum')])
+num_agg=['count','mean','std']
+movie_data_profit_gb_year=movie_data_profit.groupby('release_year')['profit','revenue','budget'].agg(num_agg)
+print(movie_data_profit_gb_year)
+print(movie_data_profit_gb_year.columns) #语句1
+
+#疑问1：
+#语句1显示MultiIndex(levels=[['profit', 'revenue', 'budget'], ['count', 'mean', 'std']],
+#                    codes=[[0, 0, 0, 1, 1, 1, 2, 2, 2], [0, 1, 2, 0, 1, 2, 0, 1, 2]])
+#问题：如何选出movie_data_profit_gb_year中某个特定列？例如profit的mean列，应该怎么写呢？
+
+#疑问2：
+#如何将movie_data_profit_gb_year的index（即year），转化成movie_data_profit_gb_year的一列呢？
+
+#疑问3：
+#可否提供一个讲解groupby数据内部结构的链接？
 
 
 # ---
