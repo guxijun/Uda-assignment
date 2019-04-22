@@ -200,7 +200,7 @@ movie_data_director.sort_values('mean',ascending=False)
 
 # **任务3.1：**对 `popularity` 最高的20名电影绘制其 `popularity` 值。
 
-# In[10]:
+# In[7]:
 
 
 movie_data_top20pop=movie_data2.sort_values('popularity',ascending=False)[:20]
@@ -214,27 +214,35 @@ plt.barh(data=movie_data_top20pop,width='popularity',y='original_title')
 # ---
 # **任务3.2：**分析电影净利润（票房-成本）随着年份变化的情况，并简单进行分析。
 
-# In[19]:
+# In[38]:
 
 
+#生成分析数据集
 movie_data_profit=movie_data2
 movie_data_profit['profit']=movie_data_profit['revenue']-movie_data_profit['budget']
 num_agg=['count','mean','std']
-movie_data_profit_gb_year=movie_data_profit.groupby('release_year')['profit','revenue','budget'].agg(num_agg)
-print(movie_data_profit_gb_year)
-print(movie_data_profit_gb_year.columns) #语句1
+movie_data_profit_gb_year=movie_data_profit.groupby('release_year')['keywords','profit','revenue','budget'].agg(num_agg)#语句1
+#print(movie_data_profit_gb_year)
+#print(movie_data_profit_gb_year.shape)
+print(movie_data_profit_gb_year[('profit','mean')])#语句2
+print(movie_data_profit_gb_year[('profit','std')])
+print(movie_data_profit_gb_year.columns)
 
-#疑问1：
-#语句1显示MultiIndex(levels=[['profit', 'revenue', 'budget'], ['count', 'mean', 'std']],
-#                    codes=[[0, 0, 0, 1, 1, 1, 2, 2, 2], [0, 1, 2, 0, 1, 2, 0, 1, 2]])
-#问题：如何选出movie_data_profit_gb_year中某个特定列？例如profit的mean列，应该怎么写呢？
+#使用分析数据集作图
+#movie_data_profit_gb_year.plot(kind='barh', x=movie_data_profit_gb_year.index, y=('profit','mean'), legend=False)
+fig1=plt.figure(num='fig1', figsize=(5,5), dpi=75, facecolor='#FFFFFF', edgecolor='#0000FF')
+plt.plot(movie_data_profit_gb_year.index, movie_data_profit_gb_year[[('profit','mean')]])
+fig2=plt.figure(num='fig2', figsize=(5,5), dpi=75, facecolor='#FFFFFF', edgecolor='#0000FF')
+plt.plot(movie_data_profit_gb_year.index, movie_data_profit_gb_year[[('profit','std')]])
 
-#疑问2：
-#如何将movie_data_profit_gb_year的index（即year），转化成movie_data_profit_gb_year的一列呢？
 
-#疑问3：
-#可否提供一个讲解groupby数据内部结构的链接？
-
+# 一、关于groupby+agg使用后，生成新的dataset的数据结构。
+# 1、.agg方法会自动舍弃不符合聚合数据格式要求的数据。例如：语句1执行后，原dataset的‘keywords’列，没有包含在新dataset中。
+# 2、新dataset的列为tuple，新dataframe列读取方法如语句2所示。
+# 
+# 二、数据分析
+# 1、电影平均利润的均值、方差都呈现逐渐上升的趋势，且高度正相关。
+# 2、利润方差值普遍高于利润均值，可见不同电影的利润差异很大。
 
 # ---
 # 
